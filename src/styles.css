@@ -1,0 +1,347 @@
+:root {
+  --ink: #25152f;
+  --cream: #fff4d8;
+  --panel: rgba(255, 244, 216, 0.9);
+  --panel-strong: rgba(255, 248, 230, 0.96);
+  --red: #ef4056;
+  --gold: #ffcb3d;
+  --teal: #22c7b8;
+  --blue: #3a7bff;
+  --violet: #7b49d6;
+  --shadow: rgba(37, 21, 47, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #13091d;
+  color: var(--ink);
+  font-family:
+    Inter, ui-rounded, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0;
+  touch-action: none;
+}
+
+button {
+  border: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app,
+#game {
+  width: 100%;
+  height: 100%;
+}
+
+#game {
+  display: block;
+  outline: none;
+}
+
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.objective-chip,
+.inventory-strip,
+.prompt,
+.control-button,
+.action-button,
+.result-panel {
+  border: 2px solid rgba(37, 21, 47, 0.55);
+  box-shadow: 0 10px 24px var(--shadow);
+}
+
+.objective-chip {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  max-width: min(320px, calc(100vw - 28px));
+  padding: 10px 14px 11px;
+  border-radius: 8px;
+  background: var(--panel);
+  transform: rotate(-1deg);
+}
+
+.chip-label,
+.box-label,
+.result-kicker {
+  display: block;
+  margin-bottom: 2px;
+  color: #805a00;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.objective-chip strong {
+  display: block;
+  font-size: clamp(0.93rem, 2.2vw, 1.1rem);
+  line-height: 1.15;
+}
+
+.inventory-strip {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  display: grid;
+  grid-template-columns: auto repeat(3, 28px);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.box-label {
+  margin: 0 4px 0 0;
+  color: #2d6f66;
+}
+
+.slot {
+  position: relative;
+  width: 28px;
+  aspect-ratio: 1;
+  border: 2px solid rgba(37, 21, 47, 0.55);
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 203, 61, 0.32)),
+    #f8df8b;
+}
+
+.slot.filled::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #fff8d2 0 15%, transparent 16%),
+    conic-gradient(from 0deg, var(--red), var(--gold), var(--teal), var(--blue), var(--red));
+  border: 1px solid rgba(37, 21, 47, 0.35);
+}
+
+.prompt {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(128px, 19vh, 190px);
+  max-width: min(480px, calc(100vw - 28px));
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 248, 230, 0.92);
+  font-weight: 900;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.touch-controls {
+  position: absolute;
+  inset-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.dpad {
+  position: relative;
+  width: 154px;
+  height: 154px;
+  pointer-events: auto;
+}
+
+.control-button,
+.action-button,
+.restart-button {
+  cursor: pointer;
+  user-select: none;
+}
+
+.control-button {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 244, 216, 0.84);
+  color: var(--ink);
+  font-size: 1.35rem;
+  font-weight: 950;
+}
+
+.control-button:active,
+.control-button.active,
+.action-button:active,
+.action-button.active,
+.restart-button:active {
+  transform: translateY(2px) scale(0.98);
+  background: var(--gold);
+}
+
+.dpad-up {
+  top: 0;
+  left: 50px;
+}
+
+.dpad-left {
+  top: 50px;
+  left: 0;
+}
+
+.dpad-right {
+  top: 50px;
+  right: 0;
+}
+
+.dpad-down {
+  bottom: 0;
+  left: 50px;
+}
+
+.action-stack {
+  display: grid;
+  gap: 12px;
+  width: min(148px, 34vw);
+  pointer-events: auto;
+}
+
+.action-button,
+.restart-button {
+  min-height: 52px;
+  border-radius: 8px;
+  background: rgba(255, 244, 216, 0.88);
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.action-button[data-action="open"] {
+  background: rgba(255, 203, 61, 0.9);
+}
+
+.action-button[data-action="use"] {
+  background: rgba(34, 199, 184, 0.9);
+}
+
+.result-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 203, 61, 0.22), transparent 40%),
+    rgba(19, 9, 29, 0.64);
+  color: var(--ink);
+  pointer-events: auto;
+}
+
+.result-panel {
+  width: min(420px, 100%);
+  padding: 22px;
+  border-radius: 8px;
+  background: var(--panel-strong);
+  text-align: center;
+}
+
+.result-panel h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  line-height: 1;
+}
+
+.result-panel p {
+  margin: 12px auto 18px;
+  max-width: 32ch;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.restart-button {
+  min-width: 170px;
+  padding: 0 18px;
+  background: var(--red);
+  color: #fff9e8;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .touch-controls {
+    opacity: 0.76;
+    transition: opacity 160ms ease;
+  }
+
+  .touch-controls:hover {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 680px), (max-height: 560px) {
+  .objective-chip {
+    top: 10px;
+    left: 10px;
+    padding: 8px 10px;
+  }
+
+  .inventory-strip {
+    top: auto;
+    right: 10px;
+    bottom: 106px;
+    grid-template-columns: repeat(3, 26px);
+  }
+
+  .box-label {
+    display: none;
+  }
+
+  .prompt {
+    bottom: 96px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .dpad {
+    width: 132px;
+    height: 132px;
+  }
+
+  .control-button {
+    width: 46px;
+    height: 46px;
+    font-size: 1.08rem;
+  }
+
+  .dpad-up,
+  .dpad-down {
+    left: 43px;
+  }
+
+  .dpad-left,
+  .dpad-right {
+    top: 43px;
+  }
+
+  .action-stack {
+    width: 118px;
+    gap: 10px;
+  }
+
+  .action-button {
+    min-height: 46px;
+    font-size: 0.92rem;
+  }
+}

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23ffcb3d'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%23ef4056'/%3E%3Cpath d='M20 38h24L32 14z' fill='%23fff4d8'/%3E%3C/svg%3E" />
+    <title>Digital Circus Quest</title>
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game"></canvas>
+
+      <div class="hud" aria-live="polite">
+        <section class="objective-chip" aria-label="Цель">
+          <span class="chip-label">Цель</span>
+          <strong id="objectiveText">Соберите 0/3 запчасти</strong>
+        </section>
+
+        <section class="inventory-strip" aria-label="Коробка">
+          <span class="box-label">Коробка</span>
+          <span class="slot" data-slot="0"></span>
+          <span class="slot" data-slot="1"></span>
+          <span class="slot" data-slot="2"></span>
+        </section>
+
+        <div id="prompt" class="prompt hidden"></div>
+
+        <div class="touch-controls" aria-label="Управление на экране">
+          <div class="dpad" aria-label="Движение">
+            <button class="control-button dpad-up" data-move="forward" aria-label="Вперед">▲</button>
+            <button class="control-button dpad-left" data-move="left" aria-label="Влево">◀</button>
+            <button class="control-button dpad-right" data-move="right" aria-label="Вправо">▶</button>
+            <button class="control-button dpad-down" data-move="back" aria-label="Назад">▼</button>
+          </div>
+          <div class="action-stack" aria-label="Действия">
+            <button class="action-button" data-action="open">Дверь</button>
+            <button class="action-button" data-action="use">Взять</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="resultOverlay" class="result-overlay hidden" role="dialog" aria-modal="true">
+        <div class="result-panel">
+          <span id="resultKicker" class="result-kicker"></span>
+          <h1 id="resultTitle"></h1>
+          <p id="resultBody"></p>
+          <button id="restartButton" class="restart-button">Играть снова</button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
