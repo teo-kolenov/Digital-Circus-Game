@@ -38,6 +38,7 @@ class DigitalCircusQuest {
     const deltaSeconds = Math.min(0.05, (time - this.previousTime) / 1000);
     this.previousTime = time;
     const statusBeforeTick = this.state.status;
+    const npcStatusBeforeTick = this.state.npc.status;
 
     if (this.input.consumeRestartRequest()) {
       this.restart();
@@ -74,7 +75,8 @@ class DigitalCircusQuest {
       this.sound.updateWalking(false, deltaSeconds);
     }
 
-    this.playStatusTransition(statusBeforeTick, this.state.status);
+    this.playNpcTransition(npcStatusBeforeTick, this.state.npc.status);
+    this.playStatusTransition(statusBeforeTick, this.state.status, npcStatusBeforeTick);
 
     const prompt = getPrompt(this.state);
     this.world.sync(this.state, deltaSeconds);
@@ -90,11 +92,27 @@ class DigitalCircusQuest {
     this.hud.update(this.state, null);
   }
 
-  private playStatusTransition(from: GameStatus, to: GameStatus): void {
+  private playStatusTransition(
+    from: GameStatus,
+    to: GameStatus,
+    npcFrom: GameState["npc"]["status"],
+  ): void {
     if (from === "playing" && to === "won") {
+      if (npcFrom === "chasing") {
+        this.world.showNpcVanishEffect(this.state.npc.position);
+        this.sound.playNpcVanish();
+      }
+
       this.sound.playWin(0.08);
     } else if (from === "playing" && to === "lost") {
       this.sound.playGameOver(0.08);
+    }
+  }
+
+  private playNpcTransition(from: GameState["npc"]["status"], to: GameState["npc"]["status"]): void {
+    if (from === "chasing" && to === "escaped") {
+      this.world.showNpcVanishEffect(this.state.npc.position);
+      this.sound.playNpcVanish();
     }
   }
 }

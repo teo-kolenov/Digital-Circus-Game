@@ -1,6 +1,8 @@
 const MASTER_VOLUME = 0.62;
 const FOOTSTEP_INTERVAL_SECONDS = 0.32;
 const FOOTSTEP_VOLUME_MULTIPLIER = 2;
+const NPC_VANISH_SOUND_URL = new URL("../../bang.mp3", import.meta.url).href;
+const NPC_VANISH_VOLUME = 0.14;
 
 type AudioGraph = {
   context: AudioContext;
@@ -17,6 +19,9 @@ export class SoundController {
   private output: GainNode | null = null;
   private walkTimer = 0;
   private footstepSide = -1;
+  private npcVanishBuffer: AudioBuffer | null = null;
+  private npcVanishLoad: Promise<AudioBuffer | null> | null = null;
+  private readonly activeTimers = new Set<number>();
   private readonly activeSources = new Set<AudioScheduledSourceNode>();
 
   constructor() {
@@ -170,6 +175,27 @@ export class SoundController {
     this.scheduleSource(shimmer, start + 0.08, start + 0.96);
   }
 
+  playNpcVanish(delaySeconds = 0): void {
+    const graph = this.ensureAudio();
+
+    if (!graph) {
+      return;
+    }
+
+    this.resumeAudio();
+
+    if (delaySeconds <= 0) {
+      this.playNpcVanishBuffer(graph);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      this.activeTimers.delete(timer);
+      this.playNpcVanishBuffer(graph);
+    }, delaySeconds * 1000);
+    this.activeTimers.add(timer);
+  }
+
   playGameOver(delaySeconds = 0): void {
     const graph = this.ensureAudio();
 
@@ -225,6 +251,12 @@ export class SoundController {
   reset(): void {
     this.walkTimer = 0;
 
+    for (const timer of this.activeTimers) {
+      window.clearTimeout(timer);
+    }
+
+    this.activeTimers.clear();
+
     for (const source of this.activeSources) {
       try {
         source.stop();
@@ -234,6 +266,62 @@ export class SoundController {
     }
 
     this.activeSources.clear();
+  }
+
+  private playNpcVanishBuffer(graph: AudioGraph): void {
+    const playBuffer = (buffer: AudioBuffer | null) => {
+      if (!buffer) {
+        return;
+      }
+
+      const source = graph.context.createBufferSource();
+      const gain = graph.context.createGain();
+      const start = graph.context.currentTime;
+
+      source.buffer = buffer;
+      gain.gain.setValueAtTime(NPC_VANISH_VOLUME, start);
+      source.connect(gain);
+      gain.connect(graph.output);
+      this.scheduleSource(source, start, start + buffer.duration + 0.02);
+    };
+
+    if (this.npcVanishBuffer) {
+      playBuffer(this.npcVanishBuffer);
+      return;
+    }
+
+    void this.loadNpcVanishBuffer(graph.context).then(playBuffer);
+  }
+
+  private loadNpcVanishBuffer(context: AudioContext): Promise<AudioBuffer | null> {
+    if (this.npcVanishBuffer) {
+      return Promise.resolve(this.npcVanishBuffer);
+    }
+
+    if (!this.npcVanishLoad) {
+      this.npcVanishLoad = fetch(NPC_VANISH_SOUND_URL)
+        .then((response) => {
+          if (!response.ok) {
+            return null;
+          }
+
+          return response.arrayBuffer();
+        })
+        .then((buffer) => {
+          if (!buffer) {
+            return null;
+          }
+
+          return context.decodeAudioData(buffer);
+        })
+        .then((buffer) => {
+          this.npcVanishBuffer = buffer;
+          return buffer;
+        })
+        .catch(() => null);
+    }
+
+    return this.npcVanishLoad;
   }
 
   private playFootstep(): void {
@@ -363,6 +451,7 @@ export class SoundController {
       return;
     }
 
+    void this.loadNpcVanishBuffer(graph.context);
     this.resumeAudio();
     window.removeEventListener("pointerdown", this.unlockAudio);
     window.removeEventListener("keydown", this.unlockAudio);

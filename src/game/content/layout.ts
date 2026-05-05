@@ -35,10 +35,11 @@ export const PLAYER = {
 };
 
 export const ASSETS = {
-  corridor: new URL("../../../Corridor.jpeg", import.meta.url).href,
-  gameStyle1: new URL("../../../Game style1.jpeg", import.meta.url).href,
-  gameStyle2: new URL("../../../Game style2.jpeg", import.meta.url).href,
-  npc: new URL("../../../NPC.jpeg", import.meta.url).href,
-  player: new URL("../../../jester_transparent_feathered.png", import.meta.url).href,
-  object: new URL("../../../object.jpeg", import.meta.url).href,
+  corridor: "/assets/Corridor.jpeg",
+  gameStyle1: "/assets/Game%20style1.jpeg",
+  gameStyle2: "/assets/Game%20style2.jpeg",
+  npc: "/assets/NPC.jpeg",
+  player: "/assets/jester_transparent_feathered.png",
+  object: "/assets/object.jpeg",
+  bangExplosion: "/assets/bang-comic-explosion.png",
 };
