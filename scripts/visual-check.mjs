@@ -190,7 +190,8 @@ try {
     assert(stats.colorBucketCount > 20, `${viewport.name}: canvas lacks visible color variety`);
     assert(stats.luminanceVariance > 40, `${viewport.name}: canvas has too little contrast`);
     assert(stats.centerClear, `${viewport.name}: HUD covers the playfield center`);
-    assert(stats.objective === "Соберите 0/3 запчасти", `${viewport.name}: objective HUD text is wrong`);
+    const expectedObjective = viewport.name === "desktop" ? "Соберите 0/3 артефакта" : "0/3 артефакта";
+    assert(stats.objective === expectedObjective, `${viewport.name}: objective HUD text is wrong`);
     assert(stats.controlCount === 6, `${viewport.name}: tablet controls are incomplete`);
     assert(stats.overflowing.length === 0, `${viewport.name}: visible text overflows: ${stats.overflowing.join(", ")}`);
     assert(runtimeIssues.length === 0, `${viewport.name}: runtime errors: ${runtimeIssues.join(" | ")}`);

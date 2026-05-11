@@ -17,6 +17,8 @@ export const ROOM = {
 export const DOOR = {
   z: -2.08,
   width: 1.45,
+  depth: 0.18,
+  openRotation: -Math.PI * 0.54,
   interactZ: -1.78,
   interactRange: 1.22,
 };

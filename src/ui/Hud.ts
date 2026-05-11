@@ -2,6 +2,7 @@ import type { GameState, InteractionPrompt } from "../game/simulation/state";
 
 export class Hud {
   private readonly objectiveText: HTMLElement;
+  private readonly compactObjectiveQuery = window.matchMedia("(max-width: 900px), (max-height: 560px)");
   private readonly prompt: HTMLElement;
   private readonly slots: HTMLElement[];
   private readonly resultOverlay: HTMLElement;
@@ -9,6 +10,7 @@ export class Hud {
   private readonly resultTitle: HTMLElement;
   private readonly resultBody: HTMLElement;
   private readonly restartButton: HTMLButtonElement;
+  private collected = 0;
 
   constructor(root: HTMLElement) {
     this.objectiveText = requireElement(root, "#objectiveText");
@@ -19,6 +21,7 @@ export class Hud {
     this.resultTitle = requireElement(root, "#resultTitle");
     this.resultBody = requireElement(root, "#resultBody");
     this.restartButton = requireElement<HTMLButtonElement>(root, "#restartButton");
+    this.compactObjectiveQuery.addEventListener("change", () => this.updateObjectiveText());
   }
 
   setRestartHandler(handler: () => void): void {
@@ -26,7 +29,8 @@ export class Hud {
   }
 
   update(state: GameState, prompt: InteractionPrompt | null): void {
-    this.objectiveText.textContent = `Соберите ${state.collected}/3 запчасти`;
+    this.collected = state.collected;
+    this.updateObjectiveText();
 
     this.slots.forEach((slot, index) => {
       slot.classList.toggle("filled", index < state.collected);
@@ -49,6 +53,11 @@ export class Hud {
     this.resultTitle.textContent = state.resultTitle;
     this.resultBody.textContent = state.resultBody;
     this.resultOverlay.classList.remove("hidden");
+  }
+
+  private updateObjectiveText(): void {
+    const progress = `${this.collected}/3 артефакта`;
+    this.objectiveText.textContent = this.compactObjectiveQuery.matches ? progress : `Соберите ${progress}`;
   }
 }
 

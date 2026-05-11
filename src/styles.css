@@ -294,14 +294,19 @@ button {
   .objective-chip {
     top: 10px;
     left: 10px;
+    max-width: min(208px, calc(100vw - 140px));
     padding: 8px 10px;
   }
 
   .inventory-strip {
-    top: auto;
-    right: 10px;
-    bottom: 106px;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: calc(10px + env(safe-area-inset-right, 0px));
+    bottom: auto;
     grid-template-columns: repeat(3, 26px);
+  }
+
+  .slot {
+    width: 26px;
   }
 
   .box-label {

@@ -7,6 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "preview": "vite preview --host 0.0.0.0",
+    "test:simulation": "node scripts/simulation-test.mjs",
     "visual-check": "node scripts/visual-check.mjs"
   },
   "dependencies": {

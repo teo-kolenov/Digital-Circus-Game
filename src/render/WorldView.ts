@@ -121,7 +121,7 @@ export class WorldView {
       const pivot = this.doorPivots.get(room.id);
 
       if (pivot) {
-        const targetRotation = room.doorOpen ? -Math.PI * 0.54 : 0;
+        const targetRotation = room.doorOpen ? DOOR.openRotation : 0;
         pivot.rotation.y = damp(pivot.rotation.y, targetRotation, 10, deltaSeconds);
       }
 
@@ -379,7 +379,7 @@ export class WorldView {
       roughness: 0.54,
       metalness: 0.04,
     });
-    const door = createBox(DOOR.width, 2.35, 0.18, doorMaterial);
+    const door = createBox(DOOR.width, 2.35, DOOR.depth, doorMaterial);
     door.position.set(DOOR.width / 2, 1.18, 0);
     door.castShadow = true;
     door.receiveShadow = true;
