@@ -20,16 +20,18 @@ export class InputController {
   private useRequested = false;
   private restartRequested = false;
 
-  constructor(root: HTMLElement) {
+  constructor(private readonly root: HTMLElement) {
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
+    window.addEventListener("blur", this.clearHeldInputs);
+    document.addEventListener("visibilitychange", this.handleVisibilityChange);
 
-    root.querySelectorAll<HTMLButtonElement>("[data-move]").forEach((button) => {
+    this.root.querySelectorAll<HTMLButtonElement>("[data-move]").forEach((button) => {
       const move = button.dataset.move as MoveName;
       this.bindHeldButton(button, () => this.activeMoves.add(move), () => this.activeMoves.delete(move));
     });
 
-    root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
+    this.root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
       const action = button.dataset.action as ActionName;
       button.addEventListener("pointerdown", (event) => {
         event.preventDefault();
@@ -88,6 +90,8 @@ export class InputController {
   dispose(): void {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
+    window.removeEventListener("blur", this.clearHeldInputs);
+    document.removeEventListener("visibilitychange", this.handleVisibilityChange);
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
@@ -122,6 +126,19 @@ export class InputController {
       event.preventDefault();
       this.activeMoves.delete(move);
     }
+  };
+
+  private readonly handleVisibilityChange = (): void => {
+    if (document.hidden) {
+      this.clearHeldInputs();
+    }
+  };
+
+  private readonly clearHeldInputs = (): void => {
+    this.activeMoves.clear();
+    this.root.querySelectorAll<HTMLButtonElement>("[data-move].active").forEach((button) => {
+      button.classList.remove("active");
+    });
   };
 
   private bindHeldButton(button: HTMLButtonElement, onDown: () => void, onUp: () => void): void {

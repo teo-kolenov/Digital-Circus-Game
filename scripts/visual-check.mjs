@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium } from "playwright-core";
 
-const targetUrl = process.env.QA_URL ?? "http://localhost:5173/";
+const targetUrl = process.env.QA_URL ?? await getDefaultTargetUrl();
 const screenshotDir = path.join(tmpdir(), "digital-circus-qa");
 const chromeCandidates = [
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -214,4 +214,25 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+async function getDefaultTargetUrl() {
+  const candidates = ["http://localhost:5174/", "http://localhost:5173/"];
+
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate, {
+        method: "HEAD",
+        signal: AbortSignal.timeout(600),
+      });
+
+      if (response.ok) {
+        return candidate;
+      }
+    } catch {
+      // Try the next local dev-server port.
+    }
+  }
+
+  return candidates[0];
 }

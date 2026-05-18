@@ -24,6 +24,10 @@ type DecorationMaterials = {
   stone: THREE.MeshStandardMaterial;
   violet: THREE.MeshStandardMaterial;
 };
+type RenderableObject = THREE.Object3D & {
+  geometry?: THREE.BufferGeometry;
+  material?: THREE.Material | THREE.Material[];
+};
 
 const PLAYER_PORTRAIT_WIDTH = 0.864;
 const PLAYER_PORTRAIT_HEIGHT = 1.38;
@@ -81,6 +85,7 @@ export class WorldView {
   }
 
   rebuild(state: GameState): void {
+    this.disposeSceneResources();
     this.scene.clear();
     this.doorPivots.clear();
     this.itemVisuals.clear();
@@ -90,6 +95,8 @@ export class WorldView {
     this.npcGroup = null;
     this.npcVanishEffect = null;
     this.npcVanishEffectElapsed = NPC_VANISH_EFFECT_SECONDS;
+    this.npcVanishOverlay.style.display = "none";
+    this.npcVanishOverlay.style.opacity = "1";
     this.lastNpcStatus = state.npc.status;
     this.renderedPlayerYaw = state.player.yaw;
 
@@ -100,6 +107,32 @@ export class WorldView {
     this.createCircusWorld(state);
     this.createPlayer();
     this.sync(state, 0);
+  }
+
+  private disposeSceneResources(): void {
+    const sharedTextures = new Set<THREE.Texture>(Object.values(this.textures));
+    const disposedGeometries = new Set<THREE.BufferGeometry>();
+    const disposedMaterials = new Set<THREE.Material>();
+    const disposedTextures = new Set<THREE.Texture>();
+
+    this.scene.traverse((object) => {
+      const renderable = object as RenderableObject;
+
+      if (renderable.geometry && !disposedGeometries.has(renderable.geometry)) {
+        disposedGeometries.add(renderable.geometry);
+        renderable.geometry.dispose();
+      }
+
+      for (const material of getObjectMaterials(renderable)) {
+        if (disposedMaterials.has(material)) {
+          continue;
+        }
+
+        disposedMaterials.add(material);
+        disposeMaterialTextures(material, sharedTextures, disposedTextures);
+        material.dispose();
+      }
+    });
   }
 
   sync(state: GameState, deltaSeconds: number): void {
@@ -1076,6 +1109,31 @@ function createDoorTexture(label: string, colorA: string, colorB: string): THREE
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+function getObjectMaterials(object: RenderableObject): THREE.Material[] {
+  if (!object.material) {
+    return [];
+  }
+
+  return Array.isArray(object.material) ? object.material : [object.material];
+}
+
+function disposeMaterialTextures(
+  material: THREE.Material,
+  sharedTextures: Set<THREE.Texture>,
+  disposedTextures: Set<THREE.Texture>,
+): void {
+  const materialRecord = material as unknown as Record<string, unknown>;
+
+  for (const value of Object.values(materialRecord)) {
+    if (!(value instanceof THREE.Texture) || sharedTextures.has(value) || disposedTextures.has(value)) {
+      continue;
+    }
+
+    disposedTextures.add(value);
+    value.dispose();
+  }
 }
 
 function damp(current: number, target: number, smoothing: number, deltaSeconds: number): number {
