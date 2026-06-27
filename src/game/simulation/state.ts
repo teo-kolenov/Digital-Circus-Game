@@ -306,20 +306,24 @@ function getNpcNavigationTarget(state: GameState): Vec2 {
 
   if (playerRegion.kind === "room") {
     const doorLane = getDoorLanePoint(playerRegion.room);
-    const corridorDoorPoint = {
+    const entrancePoint = {
       x: doorLane.x,
       z: PASSAGE.maxZ - 0.08,
     };
-
-    if (distanceTo(state.npc.position, corridorDoorPoint) > 0.24) {
-      target = corridorDoorPoint;
-      return getOpenDoorRouteTarget(state, state.npc.position, target) ?? target;
-    }
-
-    target = {
+    const insideRoomTarget = {
       x: doorLane.x,
       z: PASSAGE.minZ - 0.16,
     };
+
+    // First line the NPC up with the door lane while it is still out in the
+    // corridor, then commit to heading through into the room. The commit is
+    // directional (already past the entrance) rather than a symmetric distance
+    // band, so the NPC keeps moving inward instead of oscillating on the
+    // threshold once it crosses the doorway.
+    const lanedUp = Math.abs(state.npc.position.x - doorLane.x) <= PASSAGE.halfWidth * 0.5;
+    const reachedEntrance = state.npc.position.z <= entrancePoint.z;
+    target = lanedUp && reachedEntrance ? insideRoomTarget : entrancePoint;
+
     return getOpenDoorRouteTarget(state, state.npc.position, target) ?? target;
   }
 
@@ -526,7 +530,10 @@ function isPlayerAreaWalkable(state: GameState, x: number, z: number, radius = P
   }
 
   for (const room of state.rooms) {
-    if (!room.doorOpen || room.isDanger) {
+    // The danger room becomes walkable once its door is open, just like any
+    // other room. It only opens after the player opens it (which starts the
+    // chase), so this lets the player step into the room the NPC was hiding in.
+    if (!room.doorOpen) {
       continue;
     }
 
