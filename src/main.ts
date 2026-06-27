@@ -30,6 +30,7 @@ class DigitalCircusQuest {
     this.hud = new Hud(root);
     this.sound = new SoundController();
     this.hud.setRestartHandler(() => this.restart());
+    this.input.setGamepadStatusHandler((connected) => this.hud.setGamepadConnected(connected));
     this.world.rebuild(this.state);
     this.tick(this.previousTime);
   }
@@ -39,6 +40,8 @@ class DigitalCircusQuest {
     this.previousTime = time;
     const statusBeforeTick = this.state.status;
     const npcStatusBeforeTick = this.state.npc.status;
+
+    this.input.pollGamepad();
 
     if (this.input.consumeRestartRequest()) {
       this.restart();

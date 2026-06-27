@@ -4,6 +4,7 @@ export class Hud {
   private readonly objectiveText: HTMLElement;
   private readonly compactObjectiveQuery = window.matchMedia("(max-width: 900px), (max-height: 560px)");
   private readonly prompt: HTMLElement;
+  private readonly gamepadStatus: HTMLElement;
   private readonly slots: HTMLElement[];
   private readonly resultOverlay: HTMLElement;
   private readonly resultKicker: HTMLElement;
@@ -15,6 +16,7 @@ export class Hud {
   constructor(root: HTMLElement) {
     this.objectiveText = requireElement(root, "#objectiveText");
     this.prompt = requireElement(root, "#prompt");
+    this.gamepadStatus = requireElement(root, "#gamepadStatus");
     this.slots = Array.from(root.querySelectorAll<HTMLElement>(".slot"));
     this.resultOverlay = requireElement(root, "#resultOverlay");
     this.resultKicker = requireElement(root, "#resultKicker");
@@ -26,6 +28,10 @@ export class Hud {
 
   setRestartHandler(handler: () => void): void {
     this.restartButton.addEventListener("click", handler);
+  }
+
+  setGamepadConnected(connected: boolean): void {
+    this.gamepadStatus.classList.toggle("hidden", !connected);
   }
 
   update(state: GameState, prompt: InteractionPrompt | null): void {
