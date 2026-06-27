@@ -289,6 +289,8 @@ export class WorldView {
     this.createCorridorWalls(wallMaterialA, wallMaterialB, wallMaterialC);
     this.createStylePosters();
     this.createBuntingLine(-10.5, 10.5, 2.78, 4.96);
+    // Second garland spanning the full corridor length, hung near the door wall.
+    this.createBuntingLine(CORRIDOR.minX, CORRIDOR.maxX, 2.78, DOOR.z + 0.22);
     this.createStartCorridorDecorations();
     this.createDoorWallSegments(wallMaterialC);
 
