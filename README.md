@@ -25,6 +25,15 @@ Keyboard:
 
 Touch controls are also available on screen for movement, opening doors, and collecting parts.
 
+Gamepad (Bluetooth or USB, standard layout):
+
+- Left stick or D-pad: move
+- `A` / Cross: collect a nearby part
+- `B` / Circle or `X` / Square: open a nearby door
+- Start / Menu: restart
+
+A "Gamepad connected" badge appears in the HUD when a controller is detected. The left stick has a deadzone of 0.2 to prevent drift.
+
 ## Tech Stack
 
 - Three.js for WebGL rendering
